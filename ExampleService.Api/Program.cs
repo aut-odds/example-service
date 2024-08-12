@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Bson.Serialization.Conventions;
+using Scrutor;
 using ExampleService.Api.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,19 @@ builder.Services
     })
     .AddJsonOptions(options =>
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+    );
+
+builder.Services
+    .Scan(selector => selector
+    .FromCallingAssembly()
+    .AddClasses(tf => tf.Where(t => t.Name.EndsWith("Repository")))
+        .UsingRegistrationStrategy(RegistrationStrategy.Skip)
+        .AsSelf()
+        .WithScopedLifetime()
+    .AddClasses(tf => tf.Where(t => t.Name.EndsWith("Service")))
+        .UsingRegistrationStrategy(RegistrationStrategy.Skip)
+        .AsSelf()
+        .WithScopedLifetime()
     );
 
 builder.Services.Configure<ExampleDatabase>(builder.Configuration.GetSection("ExampleDatabase"));
