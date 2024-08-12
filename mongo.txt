@@ -1,0 +1,7 @@
+docker pull mongo
+docker run -d --name mongo -p 27017:27017 --rm mongo
+mongosh
+use exampledb
+db.createCollection('books')
+db.books.insertMany([{"book_name": "Design Patterns", "price": 54.93, "category": "Computers", "author": "Ralph Johnson"}, {"book_name": "Clean Code", "price": 43.15, "category": "Computers","author": "Robert C. Martin"}])
+db.books.find()
