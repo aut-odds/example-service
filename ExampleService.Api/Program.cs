@@ -1,5 +1,8 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
+using MongoDB.Bson.Serialization.Conventions;
 using ExampleService.Api.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +18,18 @@ builder.Services
     .AddJsonOptions(options =>
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
     );
+
+builder.Services.Configure<ExampleDatabase>(builder.Configuration.GetSection("ExampleDatabase"));
+
+builder.Services.AddSingleton<IMongoDatabase>(sp =>
+{
+    var exampleDatabase = sp.GetRequiredService<IOptions<ExampleDatabase>>().Value;
+    var mongoClient = new MongoClient(exampleDatabase.ConnectionString);
+    return mongoClient.GetDatabase(exampleDatabase.DatabaseName);
+});
+
+var convention = new SnakeCaseElementNameConvention();
+ConventionRegistry.Register(convention.Name, new ConventionPack { convention }, _ => true);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
