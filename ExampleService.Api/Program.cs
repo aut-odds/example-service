@@ -24,12 +24,12 @@ builder.Services
     .Scan(selector => selector
     .FromCallingAssembly()
     .AddClasses(tf => tf.Where(t => t.Name.EndsWith("Repository")))
-        .UsingRegistrationStrategy(RegistrationStrategy.Skip)
-        .AsSelf()
+        .UsingRegistrationStrategy(RegistrationStrategy.Throw)
+        .AsImplementedInterfaces()
         .WithScopedLifetime()
     .AddClasses(tf => tf.Where(t => t.Name.EndsWith("Service")))
-        .UsingRegistrationStrategy(RegistrationStrategy.Skip)
-        .AsSelf()
+        .UsingRegistrationStrategy(RegistrationStrategy.Throw)
+        .AsImplementedInterfaces()
         .WithScopedLifetime()
     );
 
